@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="66a21eef-c017-4a4c-b537-d36a100b6261" >
+		<http:listener-connection host="localhost" port="8081" />
+	</http:listener-config>
+	<db:config name="Database_Config" doc:name="Database Config" doc:id="aa2270f3-21b8-4b07-9472-2e8989953ace" >
+		<db:my-sql-connection host="localhost" port="3306" user="root" password="Sriram@2021" database="api" />
+	</db:config>
+	<flow name="sftp-insertFlow" doc:id="c488b574-2d1b-4129-ace4-15aeff91e174" >
+		<http:listener doc:name="Listener" doc:id="e4625817-65a9-47af-99b8-72a99adbccf5" config-ref="HTTP_Listener_config" path="/insert"/>
+		<logger level="INFO" doc:name="Logger" doc:id="d0d815e8-775f-4a7a-a9e8-a726a0c3e73c" message="#[payload]"/>
+		<db:insert doc:name="Insert" doc:id="325c3198-88ee-400e-b778-4f7a8914da47" config-ref="Database_Config">
+			<db:sql ><![CDATA[INSERT INTO emp (cusid, name, city, domain)
+VALUES (:cusid, :name, :city, :domain);]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{
+	cusid : payload.cusid,
+	name : payload.name,
+	city : payload.city,
+	domain : payload.domain
+}]]]></db:input-parameters>
+		</db:insert>
+		<logger level="INFO" doc:name="Logger" doc:id="16222e9f-6665-420c-a3c2-c2083c5bc290" message="#[payload]"/>
+	</flow>
+</mule>
